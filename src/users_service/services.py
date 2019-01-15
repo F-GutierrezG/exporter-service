@@ -10,7 +10,7 @@ class UsersService:
             current_app.config['USERS_SERVICE_URL'],
             ','.join(str(v) for v in ids))
         bearer = request.headers.get('Authorization')
-        headers = {'Authorization': bearer}
+        headers = {'Authorization': bearer, 'Content-Type': 'application/json'}
         response = requests.get(url, headers=headers)
         data = json.loads(response.text)
         return response, data
@@ -18,14 +18,10 @@ class UsersService:
     def get_admin_users(self):
         url = '{0}/admins'.format(
             current_app.config['USERS_SERVICE_URL'])
-        print('******', url)
         bearer = request.headers.get('Authorization')
-        print('******', bearer)
         headers = {'Authorization': bearer}
         response = requests.get(url, headers=headers)
-        print('******', response)
         data = json.loads(response.text)
-        print('******', response)
         return response, data
 
     def create_user(self, user_data):

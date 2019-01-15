@@ -1,0 +1,43 @@
+version: '3.6'
+
+services:
+  exporter:
+    container_name: exporter
+    build:
+      context: ./
+      dockerfile: Dockerfile-dev
+    volumes:
+      - './src:/usr/src/app'
+    ports:
+      - 5004:5000
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=manage.py
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - SECRET_KEY=secret_key
+    restart: always
+    networks:
+      - exporter-service-network
+      - onelike-network
+
+  exporter-swagger:
+    container_name: exporter-swagger
+    build:
+      context: ./swagger
+      dockerfile: Dockerfile
+    ports:
+      - 8084:8080
+    volumes:
+      - './swagger/definitions:/usr/share/nginx/html/definitions'
+    environment:
+      - API_URL=definitions/swagger.yml
+    restart: always
+    networks:
+      - exporter-service-network
+      - onelike-network
+
+networks:
+  exporter-service-network:
+    name: exporter-service-network
+  onelike-network:
+    name: onelike-network

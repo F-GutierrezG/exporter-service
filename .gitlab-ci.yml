@@ -1,0 +1,104 @@
+image: alpine
+
+variables:
+  COMMIT: ${CI_COMMIT_SHA}
+  REGISTRY_REPO: registry.gitlab.com/gusisoft/onelike/exporter-service
+  EXPORTER: exporter
+  SWAGGER: exporter-swagger
+
+stages:
+  - tests
+  - registry
+  - deploy
+
+Testing:
+  stage: tests
+  only:
+    - devel
+  before_script:
+    - sudo git clean -ffdx
+  script:
+    - docker-compose -f docker-compose-dev.yml up -d --build
+    - docker-compose -f docker-compose-dev.yml run exporter flake8 project
+    - docker-compose -f docker-compose-dev.yml run exporter python manage.py cov
+  after_script:
+    - docker-compose -f docker-compose-dev.yml down
+    - docker image rm -f exporter-service_exporter
+    - docker image rm -f exporter-service_exporter-swagger
+    - sudo git clean -ffdx
+
+Exporter Service:
+  stage: registry
+  only:
+    - stage
+    - master
+  before_script:
+    - sudo git clean -ffdx
+    - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
+    - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
+    - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
+    - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/exporter-service.git"
+    - export EXPORT_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}"
+  script:
+    - docker build $EXPORT_REPO -t $EXPORT:$COMMIT -f Dockerfile-${CI_COMMIT_REF_NAME}
+    - docker tag $EXPORT:$COMMIT $REGISTRY_REPO/$EXPORT:$TAG
+    - docker push $REGISTRY_REPO/$EXPORT:$TAG
+  after_script:
+    - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/exporter-service/exporter -q)
+    - sudo git clean -ffdx
+
+Exporter Swagger:
+  stage: registry
+  only:
+    - stage
+    - master
+  before_script:
+    - sudo git clean -ffdx
+    - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
+    - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
+    - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
+    - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/exporter-service.git"
+    - export SWAGGER_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}:swagger"
+  script:
+    - docker build $SWAGGER_REPO -t $SWAGGER:$COMMIT -f Dockerfile
+    - docker tag $SWAGGER:$COMMIT $REGISTRY_REPO/$SWAGGER:$TAG
+    - docker push $REGISTRY_REPO/$SWAGGER:$TAG
+  after_script:
+    - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/exporter-service/exporter-swagger -q)
+    - sudo git clean -ffdx
+
+Deploy Stage:
+  stage: deploy
+  environment:
+    name: stage
+    url: http://stage.onelike.gusisoft.cl
+  only:
+    - stage
+  before_script:
+    - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
+    - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
+    - rm -rf ~/.ssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - bash ./${CI_COMMIT_REF_NAME}-deploy.sh
+
+Deploy Production:
+  stage: deploy
+  environment:
+    name: production
+    url: http://onelike.gusisoft.cl
+  only:
+    - master
+  before_script:
+    - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
+    - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
+    - rm -rf ~/.ssh
+    - mkdir -p ~/.ssh
+    - echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - bash ./${CI_COMMIT_REF_NAME}-deploy.sh

@@ -83,3 +83,37 @@ class CompaniesLogics:
         row.append(user['updated_by'])
 
         return row
+
+
+class CompanyUsersLogics:
+    def csv(self, company_id):
+        _, users = CompaniesServiceFactory.get_instance().get_company_users(
+            company_id)
+
+        file = io.StringIO()
+        writer = csv.writer(file)
+
+        writer.writerow(self.__get_user_header())
+
+        for user in users:
+            writer.writerow(self.__get_row(user))
+
+        return file.getvalue()
+
+    def __get_user_header(self):
+        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL','FECHA EXPIRACION','ESTADO USUARIO','FECHA CREACION','CREADO POR','FECHA DE ACTUALIZACION','ACTUALIZADO POR']
+
+    def __get_row(self, admin):
+        row = []
+        row.append(admin['id'])
+        row.append(admin['first_name'])
+        row.append(admin['last_name'])
+        row.append(admin['email'])
+        row.append(admin['expiration'])
+        row.append(admin['active'])
+        row.append(admin['created'])
+        row.append(admin['created_by'])
+        row.append(admin['updated'])
+        row.append(admin['updated_by'])
+
+        return row

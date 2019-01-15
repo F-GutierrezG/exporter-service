@@ -59,15 +59,27 @@ class CompaniesLogics:
         return users
 
     def __get_companies_header(self):
-        return ['ID', 'IDENTIFICADOR', 'RAZON SOCIAL', 'ID USUARIO', 'NOMBRE', 'APELLIDO']
+        return ['ID', 'IDENTIFICADOR', 'RAZON SOCIAL','GIRO','FECHA DE CREACION','EMPRESA CREADA POR','FECHA ULTIMA ACTUALIZACION','ACTUALIZADO POR','ID', 'NOMBRE', 'APELLIDO', 'E-MAIL','FECHA EXPIRACION','ESTADO USUARIO','FECHA CREACION','CREADO POR','FECHA DE ACTUALIZACION','ACTUALIZADO POR']
 
     def __get_row(self, company, user):
         row = []
         row.append(company['id'])
         row.append(company['identifier'])
         row.append(company['name'])
+        row.append(company['classification']['name'])
+        row.append(company['created'])
+        row.append(company['created_by'])
+        row.append(company['updated'])
+        row.append(company['updated_by'])
         row.append(user['id'])
         row.append(user['first_name'])
         row.append(user['last_name'])
+        row.append(user['email'])
+        row.append(user['expiration'])
+        row.append(user['active'])
+        row.append(user['created'])
+        row.append(user['created_by'])
+        row.append(user['updated'])
+        row.append(user['updated_by'])
 
         return row

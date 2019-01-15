@@ -2,6 +2,7 @@ import io
 import csv
 from users_service.factories import UsersServiceFactory
 from companies_service.factories import CompaniesServiceFactory
+from social_service.factories import SocialServiceFactory
 
 
 class AdminLogics:
@@ -124,5 +125,49 @@ class CompanyUsersLogics:
         row.append(admin['created_by'])
         row.append(admin['updated'])
         row.append(admin['updated_by'])
+
+        return row
+
+
+class PublicationsLogics:
+    def csv(self):
+        service = SocialServiceFactory.get_instance()
+        _, publications = service.get_publications()
+
+        file = io.StringIO()
+        writer = csv.writer(file)
+
+        writer.writerow(self.__get_publication_header())
+
+        for publication in publications:
+            for network in publication['social_networks']:
+                rows = self.__get_row(publication, network)
+                for row in rows:
+                    writer.writerow(row)
+
+        return file.getvalue()
+
+    def __get_publication_header(self):
+        return ['ID', 'TITLE', 'MESSAGE', 'RED SOCIAL', 'TAG']
+
+    def __get_row(self, publication, network):
+        row = []
+
+        if len(publication['tags']) > 0:
+            for tag in publication['tags']:
+                row.append(self.__get_row_with_tag(publication, network, tag))
+        else:
+            row.append(self.__get_row_with_tag(publication, network))
+
+        return row
+
+    def __get_row_with_tag(self, publication, network, tag=""):
+        row = []
+
+        row.append(publication['id'])
+        row.append(publication['title'])
+        row.append(publication['message'])
+        row.append(network)
+        row.append(tag)
 
         return row

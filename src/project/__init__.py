@@ -7,10 +7,12 @@ def register_blueprints(app):
     from project.views.health import health_blueprint
     from project.views.users import users_blueprint
     from project.views.companies import companies_blueprint
+    from project.views.publications import publications_blueprint
 
     app.register_blueprint(health_blueprint)
     app.register_blueprint(users_blueprint)
     app.register_blueprint(companies_blueprint)
+    app.register_blueprint(publications_blueprint)
 
 
 def create_app(script_info=None):

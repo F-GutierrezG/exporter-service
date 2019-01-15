@@ -17,6 +17,8 @@ services:
       - SECRET_KEY=secret_key
       - USERS_SERVICE_URL=http://users:5000/users
       - AUTH_SERVICE_URL=http://users:5000/users
+      - COMPANIES_SERVICE_URL=http://companies:5000/companies
+      - SOCIAL_SERVICE_URL=http://social:5000/social
     restart: always
     networks:
       - exporter-service-network

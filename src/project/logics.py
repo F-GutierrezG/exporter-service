@@ -18,7 +18,7 @@ class AdminLogics:
         return file.getvalue()
 
     def __get_admins_header(self):
-        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL']
+        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL','FECHA EXPIRACION','ESTADO USUARIO','FECHA CREACION','CREADO POR','FECHA DE ACTUALIZACION','ACTUALIZADO POR']
 
     def __get_row(self, admin):
         row = []
@@ -26,5 +26,11 @@ class AdminLogics:
         row.append(admin['first_name'])
         row.append(admin['last_name'])
         row.append(admin['email'])
+        row.append(admin['expiration'])
+        row.append(admin['active'])
+        row.append(admin['created'])
+        row.append(admin['created_by'])
+        row.append(admin['updated'])
+        row.append(admin['updated_by'])
 
         return row

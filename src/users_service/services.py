@@ -18,10 +18,14 @@ class UsersService:
     def get_admin_users(self):
         url = '{0}/admins'.format(
             current_app.config['USERS_SERVICE_URL'])
+        print('******', url)
         bearer = request.headers.get('Authorization')
+        print('******', bearer)
         headers = {'Authorization': bearer}
         response = requests.get(url, headers=headers)
+        print('******', response)
         data = json.loads(response.text)
+        print('******', response)
         return response, data
 
     def create_user(self, user_data):

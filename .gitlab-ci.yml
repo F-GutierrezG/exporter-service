@@ -42,7 +42,7 @@ Exporter Service:
   script:
     - docker build $EXPORTER_REPO -t $EXPORTER:$COMMIT -f Dockerfile-${CI_COMMIT_REF_NAME}
     - docker tag $EXPORTER:$COMMIT $REGISTRY_REPO/$EXPORTER:$TAG
-    - docker push $REGISTRY_REPO/$EXPORT:$TAG
+    - docker push $REGISTRY_REPO/$EXPORTER:$TAG
   after_script:
     - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/exporter-service/exporter -q)
     - sudo git clean -ffdx

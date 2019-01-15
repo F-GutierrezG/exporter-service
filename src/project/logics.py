@@ -19,7 +19,9 @@ class AdminLogics:
         return file.getvalue()
 
     def __get_admins_header(self):
-        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL','FECHA EXPIRACION','ESTADO USUARIO','FECHA CREACION','CREADO POR','FECHA DE ACTUALIZACION','ACTUALIZADO POR']
+        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL',
+                'FECHA EXPIRACION', 'ESTADO USUARIO', 'FECHA CREACION',
+                'CREADO POR', 'FECHA DE ACTUALIZACION', 'ACTUALIZADO POR']
 
     def __get_row(self, admin):
         row = []
@@ -59,7 +61,12 @@ class CompaniesLogics:
         return users
 
     def __get_companies_header(self):
-        return ['ID', 'IDENTIFICADOR', 'RAZON SOCIAL','GIRO','FECHA DE CREACION','EMPRESA CREADA POR','FECHA ULTIMA ACTUALIZACION','ACTUALIZADO POR','ID', 'NOMBRE', 'APELLIDO', 'E-MAIL','FECHA EXPIRACION','ESTADO USUARIO','FECHA CREACION','CREADO POR','FECHA DE ACTUALIZACION','ACTUALIZADO POR']
+        return ['ID', 'IDENTIFICADOR', 'RAZON SOCIAL',
+                'GIRO', 'FECHA DE CREACION', 'EMPRESA CREADA POR',
+                'FECHA ULTIMA ACTUALIZACION', 'ACTUALIZADO POR', 'ID',
+                'NOMBRE', 'APELLIDO', 'E-MAIL', 'FECHA EXPIRACION',
+                'ESTADO USUARIO', 'FECHA CREACION', 'CREADO POR',
+                'FECHA DE ACTUALIZACION', 'ACTUALIZADO POR']
 
     def __get_row(self, company, user):
         row = []
@@ -101,7 +108,9 @@ class CompanyUsersLogics:
         return file.getvalue()
 
     def __get_user_header(self):
-        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL','FECHA EXPIRACION','ESTADO USUARIO','FECHA CREACION','CREADO POR','FECHA DE ACTUALIZACION','ACTUALIZADO POR']
+        return ['ID', 'NOMBRE', 'APELLIDO', 'E-MAIL', 'FECHA EXPIRACION',
+                'ESTADO USUARIO', 'FECHA CREACION', 'CREADO POR',
+                'FECHA DE ACTUALIZACION', 'ACTUALIZADO POR']
 
     def __get_row(self, admin):
         row = []

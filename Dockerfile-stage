@@ -1,6 +1,7 @@
 FROM python:3.7.2-slim
 
 RUN apt-get update && \
+    apt-get -y install ssh git && \
     apt-get clean
 
 RUN mkdir -p /usr/src/app

@@ -30,7 +30,7 @@ services:
       context: ./swagger
       dockerfile: Dockerfile
     ports:
-      - 8084:8080
+      - 8085:8080
     volumes:
       - './swagger/definitions:/usr/share/nginx/html/definitions'
     environment:

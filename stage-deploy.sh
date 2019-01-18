@@ -17,3 +17,5 @@ ssh -o StrictHostKeyChecking=no ubuntu@${STAGE_SERVER} "docker run -d --restart 
 
 ssh -o StrictHostKeyChecking=no ubuntu@${STAGE_SERVER} 'docker network connect onelike-network --ip 172.18.0.14 exporter'
 ssh -o StrictHostKeyChecking=no ubuntu@${STAGE_SERVER} 'docker network connect onelike-network --ip 172.18.0.15 exporter-swagger'
+
+ssh -o StrictHostKeyChecking=no ubuntu@${STAGE_SERVER} 'echo OK'

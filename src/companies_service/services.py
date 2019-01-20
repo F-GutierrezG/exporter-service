@@ -5,6 +5,16 @@ from flask import request, current_app
 
 
 class CompaniesService:
+    def get_company(self, company_id):
+        url = '{}/{}'.format(
+            current_app.config['COMPANIES_SERVICE_URL'],
+            company_id)
+        bearer = request.headers.get('Authorization')
+        headers = {'Authorization': bearer}
+        response = requests.get(url, headers=headers)
+        data = json.loads(response.text)
+        return response, data
+
     def get_companies(self):
         url = current_app.config['COMPANIES_SERVICE_URL']
         bearer = request.headers.get('Authorization')
@@ -35,6 +45,7 @@ class CompaniesServiceMock:
         self.clear()
 
     def clear(self):
+        self.company = None
         self.companies = []
         self.users = []
 
@@ -44,6 +55,9 @@ class CompaniesServiceMock:
             CompaniesServiceMock.instance = CompaniesServiceMock()
         return CompaniesServiceMock.instance
 
+    def set_company(self, company):
+        self.company = company
+
     def set_companies(self, companies):
         self.companies = companies
 
@@ -52,6 +66,9 @@ class CompaniesServiceMock:
 
     def set_users(self, users):
         self.users = users
+
+    def get_company(self, company_id):
+        return Response(), self.company
 
     def get_companies(self):
         companies = []

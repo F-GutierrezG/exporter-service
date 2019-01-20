@@ -148,9 +148,10 @@ class PublicationsLogics:
         return file.getvalue()
 
     def __get_publication_header(self):
-        return ['ID', 'TITLE', 'ID COMPANIA', 'TEXTO ADICIONAL', 'CONTENIDO',
-                'REFERENCIA RED SOCIAL', 'MESSAGE', 'FECHA DE PUBLICACION',
-                'FECHA CREACION', 'CREADO POR', 'RED SOCIAL', 'TAG']
+        return ['ID', 'TITLE', 'ID COMPANIA', 'IDENTIFICAROD', 'RAZON SOCIAL',
+                'TEXTO ADICIONAL', 'CONTENIDO', 'REFERENCIA RED SOCIAL',
+                'MESSAGE', 'FECHA DE PUBLICACION', 'FECHA CREACION',
+                'CREADO POR', 'RED SOCIAL', 'TAG']
 
     def __get_row(self, publication, network):
         row = []
@@ -164,11 +165,16 @@ class PublicationsLogics:
         return row
 
     def __get_row_with_tag(self, publication, network, tag=""):
+        service = CompaniesServiceFactory.get_instance()
+        _, company = service.get_company(publication['company_id'])
+
         row = []
 
         row.append(publication['id'])
         row.append(publication['title'])
         row.append(publication['company_id'])
+        row.append(company['identifier'])
+        row.append(company['name'])
         row.append(publication['additional'])
         row.append(publication['image_url'])
         row.append(publication['link'])

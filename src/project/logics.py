@@ -10,7 +10,8 @@ class AdminLogics:
         _, admins = UsersServiceFactory.get_instance().get_admin_users()
 
         file = io.StringIO()
-        writer = csv.writer(file)
+        writer = csv.writer(
+            file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         writer.writerow(self.__get_admins_header())
 
@@ -45,7 +46,8 @@ class CompaniesLogics:
         _, companies = CompaniesServiceFactory.get_instance().get_companies()
 
         file = io.StringIO()
-        writer = csv.writer(file)
+        writer = csv.writer(
+            file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         writer.writerow(self.__get_companies_header())
 
@@ -99,7 +101,8 @@ class CompanyUsersLogics:
             company_id)
 
         file = io.StringIO()
-        writer = csv.writer(file)
+        writer = csv.writer(
+            file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         writer.writerow(self.__get_user_header())
 
@@ -135,7 +138,8 @@ class PublicationsLogics:
         _, publications = service.get_publications()
 
         file = io.StringIO()
-        writer = csv.writer(file)
+        writer = csv.writer(
+            file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         writer.writerow(self.__get_publication_header())
 

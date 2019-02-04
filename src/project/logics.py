@@ -11,7 +11,7 @@ class AdminLogics:
 
         file = io.StringIO()
         writer = csv.writer(
-            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_ALL)
 
         writer.writerow(self.__get_admins_header())
 
@@ -47,7 +47,7 @@ class CompaniesLogics:
 
         file = io.StringIO()
         writer = csv.writer(
-            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_ALL)
 
         writer.writerow(self.__get_companies_header())
 
@@ -102,7 +102,7 @@ class CompanyUsersLogics:
 
         file = io.StringIO()
         writer = csv.writer(
-            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_ALL)
 
         writer.writerow(self.__get_user_header())
 
@@ -139,7 +139,7 @@ class PublicationsLogics:
 
         file = io.StringIO()
         writer = csv.writer(
-            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_MINIMAL)
+            file, delimiter=',', quotechar="'", quoting=csv.QUOTE_ALL)
 
         writer.writerow(self.__get_publication_header())
 

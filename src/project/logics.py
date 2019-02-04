@@ -182,7 +182,9 @@ class PublicationsLogics:
         row.append(publication['additional'])
         row.append(publication['image_url'])
         row.append(publication['link'])
-        row.append(publication['message'].replace("'", '"').replace("\n", " "))
+        row.append(
+            publication['message'].replace(
+                "'", '"').strip().replace("\n", " ").replace("\r", ''))
         row.append(publication['date'])
         row.append(publication['created'])
         row.append(publication['created_by'])

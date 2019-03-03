@@ -5,6 +5,18 @@ from flask import request, current_app
 
 
 class UsersService:
+    def get(self, id):
+        url = '{0}/{1}'.format(
+            current_app.config['USERS_SERVICE_URL'], id)
+        bearer = request.headers.get('Authorization')
+        headers = {'Authorization': bearer}
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = json.loads(response.text)
+        else:
+            data = None
+        return response, data
+
     def filter_by_ids(self, ids=[]):
         url = '{0}/byIds/{1}'.format(
             current_app.config['USERS_SERVICE_URL'],
@@ -46,12 +58,16 @@ class UsersServiceMock:
 
     def clear(self):
         self.users = []
+        self.user = None
 
     @staticmethod
     def get_instance():
         if UsersServiceMock.instance is None:
             UsersServiceMock.instance = UsersServiceMock()
         return UsersServiceMock.instance
+
+    def set_user(self, user):
+        self.user = user
 
     def set_users(self, users):
         self.users = users
@@ -72,3 +88,6 @@ class UsersServiceMock:
             if user['admin']:
                 users.append(user)
         return Response(), users
+
+    def get(self, id):
+        return self.user

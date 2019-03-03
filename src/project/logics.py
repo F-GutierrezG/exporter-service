@@ -5,7 +5,17 @@ from companies_service.factories import CompaniesServiceFactory
 from social_service.factories import SocialServiceFactory
 
 
-class AdminLogics:
+class BaseLogics:
+    def _get_user_names(self, id):
+        _, user = UsersServiceFactory.get_instance().get(id)
+
+        if user:
+            return "{} {}".format(user['first_name'], user['last_name'])
+
+        return ""
+
+
+class AdminLogics(BaseLogics):
     def csv(self):
         _, admins = UsersServiceFactory.get_instance().get_admin_users()
 
@@ -34,14 +44,15 @@ class AdminLogics:
         row.append(admin['expiration'])
         row.append(admin['active'])
         row.append(admin['created'])
-        row.append(admin['created_by'])
-        row.append(admin['updated'])
-        row.append(admin['updated_by'])
+        row.append(self._get_user_names(admin['created_by']))
+        row.append(
+            "" if admin['updated'] == "None" else admin['updated'])
+        row.append(self._get_user_names(admin['updated_by']))
 
         return row
 
 
-class CompaniesLogics:
+class CompaniesLogics(BaseLogics):
     def csv(self):
         _, companies = CompaniesServiceFactory.get_instance().get_companies()
 
@@ -65,11 +76,10 @@ class CompaniesLogics:
 
     def __get_companies_header(self):
         return ['ID', 'IDENTIFICADOR', 'RAZON SOCIAL',
-                'GIRO', 'FECHA DE CREACION', 'EMPRESA CREADA POR',
-                'FECHA ULTIMA ACTUALIZACION', 'ACTUALIZADO POR', 'ID',
-                'NOMBRE', 'APELLIDO', 'E-MAIL', 'FECHA EXPIRACION',
-                'ESTADO USUARIO', 'FECHA CREACION', 'CREADO POR',
-                'FECHA DE ACTUALIZACION', 'ACTUALIZADO POR']
+                'GIRO', 'ID', 'NOMBRE', 'APELLIDO', 'E-MAIL',
+                'FECHA EXPIRACION', 'ESTADO USUARIO', 'EMPRESA CREADA POR',
+                'FECHA DE CREACION', 'ACTUALIZADO POR',
+                'FECHA ULTIMA ACTUALIZACION']
 
     def __get_row(self, company, user):
         row = []
@@ -77,25 +87,23 @@ class CompaniesLogics:
         row.append(company['identifier'])
         row.append(company['name'])
         row.append(company['classification']['name'])
-        row.append(company['created'])
-        row.append(company['created_by'])
-        row.append(company['updated'])
-        row.append(company['updated_by'])
         row.append(user['id'])
         row.append(user['first_name'])
         row.append(user['last_name'])
         row.append(user['email'])
         row.append(user['expiration'])
         row.append(user['active'])
-        row.append(user['created'])
-        row.append(user['created_by'])
-        row.append(user['updated'])
-        row.append(user['updated_by'])
+        row.append(self._get_user_names(company['created_by']))
+        row.append(company['created'])
+        row.append(
+            "" if company['updated'] == "None" else company['updated'])
+        row.append(self._get_user_names(company['updated_by']))
+        row.append(company['updated'])
 
         return row
 
 
-class CompanyUsersLogics:
+class CompanyUsersLogics(BaseLogics):
     def csv(self, company_id):
         _, users = CompaniesServiceFactory.get_instance().get_company_users(
             company_id)
@@ -125,14 +133,15 @@ class CompanyUsersLogics:
         row.append(admin['expiration'])
         row.append(admin['active'])
         row.append(admin['created'])
-        row.append(admin['created_by'])
-        row.append(admin['updated'])
-        row.append(admin['updated_by'])
+        row.append(self._get_user_names(admin['created_by']))
+        row.append(
+            "" if admin['updated'] == "None" else admin['updated'])
+        row.append(self._get_user_names(admin['updated_by']))
 
         return row
 
 
-class PublicationsLogics:
+class PublicationsLogics(BaseLogics):
     def csv(self):
         service = SocialServiceFactory.get_instance()
         _, publications = service.get_publications()
@@ -154,8 +163,9 @@ class PublicationsLogics:
     def __get_publication_header(self):
         return ['ID', 'TITLE', 'ID COMPANIA', 'IDENTIFICAROD', 'RAZON SOCIAL',
                 'TEXTO ADICIONAL', 'CONTENIDO', 'REFERENCIA RED SOCIAL',
-                'MESSAGE', 'FECHA DE PUBLICACION', 'FECHA CREACION',
-                'CREADO POR', 'RED SOCIAL', 'TAG']
+                'MESSAGE', 'STATUS', 'FECHA DE PUBLICACION', 'FECHA CREACION',
+                'CREADO POR', 'FECHA ACTUALIZACION', 'ACTUALIZADOR POR',
+                'RED SOCIAL', 'TAG']
 
     def __get_row(self, publication, network):
         row = []
@@ -185,9 +195,13 @@ class PublicationsLogics:
         row.append(
             publication['message'].replace(
                 "'", '"').strip().replace("\n", " ").replace("\r", ''))
+        row.append(publication['status'])
         row.append(publication['date'])
         row.append(publication['created'])
-        row.append(publication['created_by'])
+        row.append(self._get_user_names(publication['created_by']))
+        row.append(
+            "" if publication['updated'] == "None" else publication['updated'])
+        row.append(self._get_user_names(publication['updated_by']))
         row.append(network)
         row.append(tag)
 

@@ -1,7 +1,9 @@
-image: alpine
+image: docker
+services:
+  - docker:dind
 
 variables:
-  COMMIT: ${CI_COMMIT_SHA}
+  $COMMIT: $CI_COMMIT_SHA
   REGISTRY_REPO: registry.gitlab.com/gusisoft/onelike/exporter-service
   EXPORTER: exporter
   SWAGGER: exporter-swagger
@@ -16,16 +18,14 @@ Testing:
   only:
     - devel
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
+    - pip install docker-compose
   script:
     - docker-compose -f docker-compose-dev.yml up -d --build
     - docker-compose -f docker-compose-dev.yml run exporter flake8 project
     - docker-compose -f docker-compose-dev.yml run exporter python manage.py cov
   after_script:
     - docker-compose -f docker-compose-dev.yml down
-    - docker image rm -f exporter-service_exporter
-    - docker image rm -f exporter-service_exporter-swagger
-    - sudo git clean -ffdx
 
 Exporter Service:
   stage: registry
@@ -33,19 +33,18 @@ Exporter Service:
     - stage
     - master
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
     - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/exporter-service.git"
     - export EXPORTER_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}"
   script:
-    - docker build $EXPORTER_REPO -t $EXPORTER:$COMMIT -f Dockerfile-${CI_COMMIT_REF_NAME}
-    - docker tag $EXPORTER:$COMMIT $REGISTRY_REPO/$EXPORTER:$TAG
+    - docker build $EXPORTER_REPO -t $EXPORTER:$CI_COMMIT_SHA -f Dockerfile-${CI_COMMIT_REF_NAME}
+    - docker tag $EXPORTER:$CI_COMMIT_SHA $REGISTRY_REPO/$EXPORTER:$TAG
     - docker push $REGISTRY_REPO/$EXPORTER:$TAG
   after_script:
     - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/exporter-service/exporter -q)
-    - sudo git clean -ffdx
 
 Exporter Swagger:
   stage: registry
@@ -53,19 +52,18 @@ Exporter Swagger:
     - stage
     - master
   before_script:
-    - sudo git clean -ffdx
+    - apk add --no-cache git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - docker login -u gitlab-ci-token -p $DOCKER_TOKEN registry.gitlab.com
     - export MAIN_REPO="https://${GITLAB_USER}:${GITLAB_PASSWORD}@gitlab.com/gusisoft/OneLike/exporter-service.git"
     - export SWAGGER_REPO="${MAIN_REPO}#${CI_COMMIT_REF_NAME}:swagger"
   script:
-    - docker build $SWAGGER_REPO -t $SWAGGER:$COMMIT -f Dockerfile
-    - docker tag $SWAGGER:$COMMIT $REGISTRY_REPO/$SWAGGER:$TAG
+    - docker build $SWAGGER_REPO -t $SWAGGER:$CI_COMMIT_SHA -f Dockerfile
+    - docker tag $SWAGGER:$CI_COMMIT_SHA $REGISTRY_REPO/$SWAGGER:$TAG
     - docker push $REGISTRY_REPO/$SWAGGER:$TAG
   after_script:
     - docker image rm -f $(docker images registry.gitlab.com/gusisoft/onelike/exporter-service/exporter-swagger -q)
-    - sudo git clean -ffdx
 
 Deploy Stage:
   stage: deploy
@@ -75,6 +73,7 @@ Deploy Stage:
   only:
     - stage
   before_script:
+    - apk add --no-cache openssh-client git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - export USERS_SERVICE_URL=${STAGE_USERS_SERVICE_URL}
@@ -87,7 +86,7 @@ Deploy Stage:
     - chmod 600 ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - bash ./${CI_COMMIT_REF_NAME}-deploy.sh
+    - sh ./${CI_COMMIT_REF_NAME}-deploy.sh
 
 Deploy Production:
   stage: deploy
@@ -97,6 +96,7 @@ Deploy Production:
   only:
     - master
   before_script:
+    - apk add --no-cache openssh-client git
     - export COMMIT_TIME=$(git show -s --format=%ct $CI_COMMIT_SHA)
     - export TAG=${CI_COMMIT_REF_NAME}_$COMMIT_TIME
     - export USERS_SERVICE_URL=${PROD_USERS_SERVICE_URL}
@@ -109,4 +109,4 @@ Deploy Production:
     - chmod 600 ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - bash ./${CI_COMMIT_REF_NAME}-deploy.sh
+    - sh ./${CI_COMMIT_REF_NAME}-deploy.sh

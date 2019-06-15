@@ -3,7 +3,6 @@ services:
   - docker:dind
 
 variables:
-  $COMMIT: $CI_COMMIT_SHA
   REGISTRY_REPO: registry.gitlab.com/gusisoft/onelike/exporter-service
   EXPORTER: exporter
   SWAGGER: exporter-swagger
